@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-
+/**
+ * Created by sylvek on 28/12/2015.
+ */
 public class Devices extends Database {
 
     public static final String _ID = "_id";

@@ -1,7 +1,9 @@
 package sliitassisme.test2.FirstTime;
 
 import android.app.ActivityManager;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -16,6 +18,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +26,13 @@ import java.util.Random;
 
 import sliitassisme.test2.BluetoothLEService;
 import sliitassisme.test2.CommonActivity;
+import sliitassisme.test2.Dashboard.DashboardActivity;
+import sliitassisme.test2.GPS.GPSBackgroundReciver;
 import sliitassisme.test2.R;
 import sliitassisme.test2.database.Devices;
+
+import static sliitassisme.test2.MainActivity.DATABASEHANDLER;
+import static sliitassisme.test2.MainActivity.firsttime;
 
 //import com.Sliit.assistme.dashboard.DashboardActivity;
 
@@ -32,6 +40,8 @@ import sliitassisme.test2.database.Devices;
 public class FirstTimeDevicesActivity extends CommonActivity implements FirstTimeDevicesFragment.OnDevicesListener, FirstTimeDeviceAlertDialogFragment.OnConfirmAlertDialogListener  {
 
     public static final String TAG = FirstTimeDevicesActivity.class.toString();
+
+    public static Button btndone;
 
     private BluetoothLEService service; //for servicedicoverd in bleclass
 
@@ -61,6 +71,8 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
 
     private final FirstTimeDevicesFragment devicesFragment = FirstTimeDevicesFragment.instance();
 
+
+
     private Handler mHandler;
     private BluetoothAdapter mBluetoothAdapter;
     private Runnable stopScan;
@@ -89,6 +101,7 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
     //insert data after selecting divice
     private void selectDevice(String name, String address)
     {
+        DATABASEHANDLER.addProductItem(name,address);
         Devices.insert(this, name, address);
         Devices.setEnabled(this, address, true);
         service.connect(address);
@@ -102,11 +115,12 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
 
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
-
+        btndone=(Button) findViewById(R.id.btnDone);
         mHandler = new Handler();
-
+        Button btndone=(Button) findViewById(R.id.btnDone);
         showDevices();
-
+        //btndone.setVisibility(View.INVISIBLE);
+        //btndone.setVisibility(View.GONE);
         //survice not running strt again
         if (!isMyServiceRunning(BluetoothLEService.class)) {
             startService(new Intent(this, BluetoothLEService.class));
@@ -176,6 +190,7 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
     public void onDevicesStarted()
     {
         bindService(new Intent(this, BluetoothLEService.class), serviceConnection, BIND_AUTO_CREATE);
+
     }
 
     //stop con to all BLE's
@@ -192,12 +207,21 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
     //select Device
     @Override
     public void onDevice(String name, String address) {
+        if(firsttime==1){
         final Intent intent = new Intent(this, FirstTimeDevicesActivity.class);// need to edit
-        intent.putExtra(Devices.ADDRESS, address);
-        intent.putExtra(Devices.NAME, name);
+        //intent.putExtra(Devices.ADDRESS, address);
+        //intent.putExtra(Devices.NAME, name);
+           // btndone.setVisibility(View.INVISIBLE);
         startActivity(intent);
-    }
+        }
+        else{
+            final Intent intent1 = new Intent(this, DashboardActivity.class);// need to edit
+            intent1.putExtra(Devices.ADDRESS, address);
+            intent1.putExtra(Devices.NAME, name);
+            startActivity(intent1);
+        }
 
+    }
 
     @Override
     public void onChangeDeviceName(String name, String address, boolean checked)
@@ -255,6 +279,7 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
     @Override
     public void doPositiveClick(String address, String name)
     {
+        DATABASEHANDLER.updateDataItemName(address,name);
         Devices.updateDevice(this, address, name);
         devicesFragment.refresh();
     }
@@ -275,6 +300,7 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
     @Override
     public void doDeleteClick(String address)
     {
+        DATABASEHANDLER.removeSingleContact(address);
         service.remove(address);
         Devices.removeDevice(this, address);
         devicesFragment.refresh();
@@ -293,9 +319,33 @@ public class FirstTimeDevicesActivity extends CommonActivity implements FirstTim
         return false;
     }
 
+    private PendingIntent pendingIntent;
+    private AlarmManager manager;
 
     public void clickDone(View view) {
-        Intent intent1=new Intent(getApplicationContext(),FirstTimeenterDailyScedule.class);
-        startActivity(intent1);
+
+        Intent alarmIntent = new Intent(this, GPSBackgroundReciver.class);
+        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        int interval = 15000;
+
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
+        
+        final Intent intent = new Intent(this, FirstTimeenterDailyScedule.class);
+        startActivity(intent);
+
+
+        //finish();
+        //stopService(new Intent(this, BluetoothLEService.class));
+        //Intent intent1=new Intent(getApplicationContext(),FirstTimeenterDailyScedule.class);
+        //Intent intent1=new Intent(getApplicationContext(),DevicesActivity.class);
+        //startActivity(intent1);
+
+       /*Intent i = getBaseContext().getPackageManager().
+                getLaunchIntentForPackage(getBaseContext().getPackageName());
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);*/
+
     }
 }

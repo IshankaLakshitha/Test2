@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * Created by sylvek on 04/03/2016.
+ */
 public class Database {
     public static final String DATABASE_NAME = "itracing2DB";
     public static final int DATABASE_VERSION = 3;

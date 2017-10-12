@@ -50,6 +50,7 @@ public class FirstTimeDevicesFragment extends ListFragment implements LoaderMana
         final FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         final Button done=(Button) view.findViewById(R.id.btnDone);
 
+       // done.setOnClickListener(View.OnClickListener);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

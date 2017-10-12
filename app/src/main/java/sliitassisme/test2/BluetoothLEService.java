@@ -1,7 +1,5 @@
 package sliitassisme.test2;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,7 +23,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import sliitassisme.test2.database.Devices;
-import sliitassisme.test2.FirstTime.FirstTimeDevicesActivity;
 
 //import sliitassisme.test2.FirstTimeDevicesActivity;
 
@@ -101,6 +98,7 @@ public class BluetoothLEService extends Service {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     broadcaster.sendBroadcast(new Intent(GATT_CONNECTED));
                     gatt.discoverServices();
+
                 }
 
                 if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -158,6 +156,7 @@ public class BluetoothLEService extends Service {
                         if (!service.getCharacteristics().isEmpty()) {
                             buttonCharacteristic = service.getCharacteristics().get(0);
                             setCharacteristicNotification(gatt, buttonCharacteristic, true);
+                            Log.v("aa","gattIsh");
                         }
                     }
 
@@ -185,47 +184,7 @@ public class BluetoothLEService extends Service {
             handler.post(trackRemoteRssi);
         }
 
-/*
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            Log.d(TAG, "onCharacteristicChanged()");
-            final long delayDoubleClick = com.Sliit.assistme.Preferences.getDoubleButtonDelay(getApplicationContext());
 
-            final long now = SystemClock.elapsedRealtime();
-            if (lastChange + delayDoubleClick > now && characteristic.getUuid().equals(lastUuid) && gatt.getDevice().getAddress().equals(lastAddress)) {
-                Log.d(TAG, "onCharacteristicChanged() - double click");
-                lastChange = 0;
-                lastUuid = null;
-                lastAddress = "";
-                handler.removeCallbacks(r);
-                for (String action : com.Sliit.assistme.Preferences.getActionDoubleButton(getApplicationContext(), address)) {
-                    sendAction(com.Sliit.assistme.Preferences.Source.double_click, action);
-                }
-            } else {
-                lastChange = now;
-                lastUuid = characteristic.getUuid();
-                lastAddress = gatt.getDevice().getAddress();
-                r = new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "onCharacteristicChanged() - simple click");
-                        for (String action : com.Sliit.assistme.Preferences.getActionSimpleButton(getApplicationContext(), CustomBluetoothGattCallback.this.address)) {
-                            sendAction(com.Sliit.assistme.Preferences.Source.single_click, action);
-                        }
-                    }
-                };
-                handler.postDelayed(r, delayDoubleClick);
-            }
-        }*/
-
-       /* private void sendAction(com.Sliit.assistme.Preferences.Source source, String action) {
-            final Intent intent = new Intent(BROADCAST_INTENT_ACTION.equals(action) ? ACTION_PREFIX + action + "." + source : ACTION_PREFIX + action);
-            intent.putExtra(Devices.ADDRESS, address);
-            intent.putExtra(Devices.SOURCE, source.name());
-            sendBroadcast(intent);
-
-            Log.d(TAG, "onCharacteristicChanged() address: " + address + " - sendBroadcast action: " + intent.getAction());
-        }*/
 
        //eporting the result of a characteristic ble Btry level not used yet
         @Override
@@ -297,14 +256,7 @@ public class BluetoothLEService extends Service {
     //set notifivation
     public void setForegroundEnabled(boolean enabled) {
         if (enabled) {
-            final Notification notification = new Notification.Builder(this)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentTitle(getText(R.string.app_name))
-                    .setTicker("aa")
-                    .setContentText("aa")
-                    .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, FirstTimeDevicesActivity.class), 0))
-                    .setShowWhen(false).build();
-            startForeground(FOREGROUND_ID, notification);
+
         } else {
             stopForeground(true);
         }
@@ -370,6 +322,7 @@ public class BluetoothLEService extends Service {
         final BluetoothGattCharacteristic characteristic = immediateAlertService.getCharacteristics().get(0);
         characteristic.setValue(alertType, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
         bluetoothGatt.get(address).writeCharacteristic(characteristic);
+        Log.v("dd","ringer");
 
     }
 

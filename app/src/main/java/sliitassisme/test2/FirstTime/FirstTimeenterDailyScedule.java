@@ -1,10 +1,14 @@
 package sliitassisme.test2.FirstTime;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,7 +25,9 @@ public class FirstTimeenterDailyScedule extends AppCompatActivity {
     DBhandler DATABASEHANDLER;
     int DayID=1;
     CheckBox CB;
-
+    EditText Location;
+    EditText Time;
+    Spinner spinner;
     int index=0;
     List<String> Items = new ArrayList<String>();
 
@@ -34,6 +40,9 @@ public class FirstTimeenterDailyScedule extends AppCompatActivity {
 
         //test=(TextView) findViewById(R.id.txtTest);
         DAY=(TextView) findViewById(R.id.txtDay);
+        Location=(EditText)findViewById(R.id.txtLocation);
+        Time=(EditText)findViewById(R.id.txtTime);
+        spinner=(Spinner)findViewById(R.id.spinner);
 
         DAY.setText("MONDAY");
         //addDays();
@@ -45,6 +54,14 @@ public class FirstTimeenterDailyScedule extends AppCompatActivity {
         GONEXT.setText("TUESDAY");
 
         CB= (CheckBox) findViewById(R.id.IdCheckBox);
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.Transportation_array, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
     }
 
 
@@ -101,6 +118,11 @@ public class FirstTimeenterDailyScedule extends AppCompatActivity {
             case 7:
                 DATABASEHANDLER.addProductSedule("SUN");
                 addData("SUN");
+                Intent i = getBaseContext().getPackageManager().
+                        getLaunchIntentForPackage(getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
                 finish();
                 break;
 
@@ -141,16 +163,17 @@ public class FirstTimeenterDailyScedule extends AppCompatActivity {
                 //CB.setChecked(false);
                 DAY.setText("SUNDAY");GOPREV.setText("SATERDAY");
                 GONEXT.setText("FINISH");//DayID--;
+
                 break;
         }
     }
 
-    public void addDays(){
+    /*public void addDays(){
         String []Days={"MON","TUE","WED","THU","FRI","SAT","SUN"};
         for (int d=0;d<=6;d++){
             DATABASEHANDLER.addProductSedule(Days[d]);
         }
-    }
+    }*/
 
     public void addData(String day){
         int index1=0;
@@ -161,7 +184,7 @@ public class FirstTimeenterDailyScedule extends AppCompatActivity {
 
             index1++;
         }
-        DATABASEHANDLER.updateDataSedule(day,allItems);
+        DATABASEHANDLER.updateDataSedule(day,allItems,Location.getText().toString(),Time.getText().toString(),spinner.getSelectedItem().toString());
     }
 
     public void aaa(View view) {

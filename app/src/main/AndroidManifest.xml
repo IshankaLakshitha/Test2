@@ -16,14 +16,25 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <permission android:name="sliitassisme.maptest.permission.MAP_RECIVE" android:protectionLevel="signature"/>
+    <uses-permission android:name="sliitassisme.maptest.permission.MAP_RECIVE"/>
+    <uses-permission android:name="com.google.andoid.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+
+
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,15 +42,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".GPS.GpsActivity"/>
         <activity android:name=".FirstTime.FirstTimeDevicesActivity" />
 
+
+        <activity android:name=".FirstTime.FirstTimeenterDailyScedule"></activity>
+
+        <activity android:name=".Dashboard.DashboardActivity"
+            android:parentActivityName=".devices.DevicesActivity"/>
+
         <service android:name=".BluetoothLEService" />
+
+
 
         <receiver android:name=".receivers.LinkBackground">
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".receivers.CapturePosition">
             <intent-filter>
                 <action android:name="net.sylvek.itracing2.action.CAPTURE_POSITION" />
@@ -65,8 +87,15 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".Main2Activity" />
-        <activity android:name=".FirstTime.FirstTimeenterDailyScedule"></activity>
+        <receiver android:name=".GPS.GPSBackgroundReciver"></receiver>
+        <meta-data android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCeHU8ParZgqWJzVpiorJQ2lu4HK5PF1e8"/>
+
+        <meta-data android:name="com.google.android.gms.vision"
+            android:value="@integer/google_play_services_version"/>
+
+
+
     </application>
 
 </manifest>

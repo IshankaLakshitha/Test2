@@ -22,22 +22,26 @@ package sliitassisme.test2.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.CancellationSignal;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
-//A loader that queries the ContentResolver and returns a Cursor.
-// This class implements the Loader protocol in a standard way for querying cursors,
-// building on
-// AsyncTaskLoader to perform the cursor query on a background thread so that it does not block the application's UI
 public class SQLiteCursorLoader extends AbstractCursorLoader {
     SQLiteOpenHelper db = null;
     String rawQuery = null;
     String[] args = null;
 
-
+    /**
+     * Creates a fully-specified SQLiteCursorLoader. See
+     * {@link SQLiteDatabase#rawQuery(String, String[], CancellationSignal)}
+     * SQLiteDatabase.rawQuery()} for documentation on the
+     * meaning of the parameters. These will be passed as-is
+     * to that call.
+     */
     public SQLiteCursorLoader(Context context, SQLiteOpenHelper db,
                               String rawQuery, String[] args)
     {
